@@ -1,0 +1,636 @@
+.prof-avatar {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  z-index: 15;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(10, 14, 20, 0.72), rgba(6, 8, 12, 0.92));
+    opacity: 1;
+    transition: opacity 220ms ease;
+    pointer-events: auto;
+  }
+
+  &__card {
+    position: relative;
+    width: min(480px, 78vw);
+    height: min(540px, 85vh);
+    border-radius: 42px;
+    background: linear-gradient(180deg, rgba(40, 56, 80, 0.95), rgba(12, 18, 28, 0.98));
+    box-shadow: 0 42px 90px rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: clamp(32px, 6vw, 48px);
+    pointer-events: auto;
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 240ms ease, transform 240ms ease;
+  }
+
+  &__stage {
+    position: relative;
+    width: 240px;
+    height: 320px;
+    transform: scale(var(--prof-avatar-scale, 1.6));
+    transform-origin: bottom center;
+  }
+
+  &__toggle {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    padding: 12px 20px;
+    background: linear-gradient(180deg, #2d79c7, #174c85);
+    color: #f4f9ff;
+    font-weight: 600;
+    border: none;
+    border-radius: 999px;
+    box-shadow: 0 16px 32px rgba(23, 76, 133, 0.35);
+    cursor: pointer;
+    z-index: 16;
+    transition: transform 140ms ease, box-shadow 140ms ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 40px rgba(23, 76, 133, 0.45);
+    }
+  }
+
+  &__shadow {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 220px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.5);
+    filter: blur(20px);
+  }
+
+  &__figure {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  &__head {
+    position: relative;
+    width: 188px;
+    height: 196px;
+    transform-origin: bottom center;
+    transition: transform 200ms ease;
+  }
+
+  &__hair {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 182px;
+    height: 118px;
+  }
+
+  &__hair-crown {
+    position: absolute;
+    inset: 0;
+    border-radius: 60% 60% 42% 42%;
+    background: radial-gradient(circle at 40% 35%, #3f3f42, #1f1f23 68%, #101014 100%);
+    box-shadow: inset 0 -16px 18px rgba(0, 0, 0, 0.55);
+  }
+
+  &__hair-side {
+    position: absolute;
+    top: 54px;
+    width: 42px;
+    height: 82px;
+    border-radius: 46% 46% 40% 40%;
+    background: linear-gradient(180deg, #56585d, #2f3036 80%);
+
+    &--left {
+      left: -6px;
+    }
+
+    &--right {
+      right: -6px;
+      transform: scaleX(-1);
+    }
+  }
+
+  &__ear {
+    position: absolute;
+    top: 96px;
+    width: 36px;
+    height: 56px;
+    border-radius: 48% 48% 40% 40%;
+    background: linear-gradient(180deg, #f6cbb1, #dfa483);
+    box-shadow: inset -6px -8px 12px rgba(0, 0, 0, 0.25);
+
+    &--left {
+      left: -12px;
+    }
+
+    &--right {
+      right: -12px;
+      transform: scaleX(-1);
+    }
+  }
+
+  &__ear-inner {
+    position: absolute;
+    inset: 14px 10px 12px 8px;
+    border-radius: 40% 40% 45% 45%;
+    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4), rgba(200, 150, 120, 0.6));
+    box-shadow: inset -4px -6px 10px rgba(0, 0, 0, 0.25);
+  }
+
+  &__face {
+    position: absolute;
+    top: 44px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 168px;
+    height: 156px;
+    border-radius: 50% 50% 46% 46%;
+    background: radial-gradient(circle at 50% 30%, #ffd8bf, #efbb99 70%, #d19674 100%);
+    box-shadow: inset 0 -18px 26px rgba(0, 0, 0, 0.25);
+  }
+
+  &__temple {
+    position: absolute;
+    top: 32px;
+    width: 34px;
+    height: 88px;
+    border-radius: 40% 20% 40% 40%;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.18));
+
+    &--left {
+      left: 8px;
+    }
+
+    &--right {
+      right: 8px;
+      transform: scaleX(-1);
+    }
+  }
+
+  &__brow {
+    position: absolute;
+    top: 44px;
+    width: 56px;
+    height: 14px;
+    border-radius: 18px;
+    background: linear-gradient(180deg, #2b2724, #161311);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.35);
+
+    &--left {
+      left: 26px;
+      transform: rotate(-6deg);
+    }
+
+    &--right {
+      right: 26px;
+      transform: rotate(6deg);
+    }
+  }
+
+  &__eye {
+    position: absolute;
+    top: 68px;
+    width: 44px;
+    height: 28px;
+    border-radius: 18px;
+    background: linear-gradient(180deg, #f6fbff, #cad4e0 80%);
+    box-shadow: inset -5px -6px 12px rgba(0, 0, 0, 0.18);
+
+    &--left {
+      left: 30px;
+    }
+
+    &--right {
+      right: 30px;
+    }
+  }
+
+  &__eye-iris {
+    position: absolute;
+    inset: 6px 12px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, #445672, #182032 80%);
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.4);
+  }
+
+  &__eye-highlight {
+    position: absolute;
+    top: 76px;
+    width: 18px;
+    height: 12px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0));
+    opacity: 0.9;
+
+    &--left {
+      left: 54px;
+    }
+
+    &--right {
+      right: 54px;
+    }
+  }
+
+  &__nose {
+    position: absolute;
+    top: 92px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 32px;
+    height: 44px;
+    border-radius: 50% 50% 46% 46%;
+    background: radial-gradient(circle at 40% 20%, #f9c6a2, #dc9770 80%);
+    box-shadow: inset -6px -8px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  &__philtrum {
+    position: absolute;
+    top: 124px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 26px;
+    height: 14px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0));
+  }
+
+  &__mouth {
+    position: absolute;
+    top: 140px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 28px;
+    border-radius: 16px;
+    background: linear-gradient(180deg, #572f38, #2f1115 70%);
+    overflow: hidden;
+  }
+
+  &__mouth-inner {
+    position: absolute;
+    inset: 8px 10px 6px;
+    border-radius: 14px;
+    background: radial-gradient(circle at 50% 10%, #d6666e, #74242f 80%);
+    transform-origin: top center;
+    transition: transform 160ms ease;
+  }
+
+  &__lip {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 12px;
+    border-radius: 40% 40% 50% 50%;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.35), transparent 68%);
+  }
+
+  &__chin-highlight {
+    position: absolute;
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 96px;
+    height: 42px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.25), rgba(221, 170, 138, 0.6));
+    box-shadow: inset 0 -12px 22px rgba(0, 0, 0, 0.18);
+  }
+
+  &__glasses {
+    position: absolute;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 156px;
+    height: 64px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &__glasses-lens {
+    position: relative;
+    width: 68px;
+    height: 100%;
+    border-radius: 22px;
+    border: 5px solid rgba(88, 110, 138, 0.9);
+    background: linear-gradient(180deg, rgba(143, 170, 198, 0.28), rgba(35, 45, 60, 0.22));
+    box-shadow: inset 0 0 12px rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(2px);
+  }
+
+  &__glasses-bridge {
+    position: absolute;
+    top: 26px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 28px;
+    height: 10px;
+    background: rgba(88, 110, 138, 0.95);
+    border-radius: 6px;
+  }
+
+  &__neck {
+    position: relative;
+    width: 96px;
+    height: 46px;
+    margin-top: -6px;
+    border-radius: 48% 48% 40% 40%;
+    background: linear-gradient(180deg, #f4c2a4, #d5926e 75%);
+    box-shadow: inset 0 -12px 18px rgba(0, 0, 0, 0.25);
+  }
+
+  &__shoulders {
+    position: relative;
+    width: 220px;
+    height: 64px;
+    border-radius: 48% 48% 30% 30%;
+    background: linear-gradient(180deg, #cfd9e6, #9fb4cd);
+    box-shadow: inset 0 -18px 24px rgba(0, 0, 0, 0.2);
+  }
+
+  &__torso {
+    position: relative;
+    width: 216px;
+    height: 230px;
+    border-radius: 60px 60px 32px 32px;
+    background: linear-gradient(180deg, #dbe6f2, #a6bacf 70%, #94aec7 100%);
+    overflow: hidden;
+    box-shadow: inset 0 -26px 30px rgba(0, 0, 0, 0.22);
+  }
+
+  &__shirt {
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(0deg, rgba(255, 255, 255, 0.45) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(170, 192, 212, 0.45) 1px, transparent 1px);
+    background-size: 8px 8px;
+    opacity: 0.9;
+  }
+
+  &__shirt-seam {
+    position: absolute;
+    inset: 0 18px;
+    border-radius: 42px 42px 0 0;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    pointer-events: none;
+  }
+
+  &__placket {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 38px;
+    height: 100%;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(145, 166, 190, 0.78));
+    box-shadow: inset 0 -22px 24px rgba(0, 0, 0, 0.18);
+  }
+
+  &__button {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #eef2f7, #b6c2d2 65%);
+    box-shadow: inset 0 4px 6px rgba(0, 0, 0, 0.18);
+
+    &--top {
+      top: 48px;
+    }
+
+    &--mid {
+      top: 108px;
+    }
+
+    &--low {
+      top: 168px;
+    }
+  }
+
+  &__pocket {
+    position: absolute;
+    top: 68px;
+    left: 134px;
+    width: 64px;
+    height: 56px;
+    border-radius: 12px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(180, 200, 222, 0.7));
+    border: 2px solid rgba(255, 255, 255, 0.6);
+  }
+
+  &__arm {
+    position: absolute;
+    bottom: -10px;
+    width: 120px;
+    height: 160px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform-origin: top center;
+    transition: transform 220ms ease;
+
+    &--left {
+      left: -70px;
+      transform: rotate(-10deg);
+    }
+
+    &--right {
+      right: -70px;
+      transform: rotate(12deg);
+    }
+  }
+
+  &__sleeve {
+    width: 96px;
+    height: 78px;
+    border-radius: 34px;
+    background: linear-gradient(180deg, #d8e4f1, #a7bcd4 72%);
+    box-shadow: inset 0 -16px 24px rgba(0, 0, 0, 0.22);
+  }
+
+  &__sleeve-roll {
+    position: absolute;
+    top: 58px;
+    width: 92px;
+    height: 26px;
+    border-radius: 24px;
+    background: linear-gradient(180deg, #f5faff, #cbd8e8);
+    box-shadow: inset 0 -6px 10px rgba(0, 0, 0, 0.18);
+  }
+
+  &__forearm {
+    position: absolute;
+    top: 64px;
+    width: 88px;
+    height: 90px;
+    border-radius: 40px;
+    background: linear-gradient(180deg, #f5c8a5, #d69a72 80%);
+    box-shadow: inset 0 -16px 18px rgba(0, 0, 0, 0.24);
+  }
+
+  &__hand {
+    position: absolute;
+    bottom: -6px;
+    width: 94px;
+    height: 86px;
+    border-radius: 38px;
+    background: radial-gradient(circle at 40% 25%, #ffe0bf, #d99466 85%);
+    box-shadow: inset 0 -20px 24px rgba(0, 0, 0, 0.28);
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    padding-bottom: 18px;
+  }
+
+  &__finger {
+    width: 32px;
+    height: 44px;
+    border-radius: 20px;
+    background: radial-gradient(circle at 50% 20%, rgba(255, 205, 165, 0.95), rgba(198, 118, 78, 0.85));
+    margin: 0 2px;
+    box-shadow: inset 0 -10px 14px rgba(0, 0, 0, 0.25);
+
+    &--thumb {
+      height: 36px;
+      border-radius: 24px;
+      transform: translateY(8px);
+      background: radial-gradient(circle at 40% 15%, rgba(255, 208, 170, 0.9), rgba(203, 123, 83, 0.8));
+    }
+  }
+
+  &__watch {
+    position: absolute;
+    bottom: 48px;
+    left: 12px;
+    width: 68px;
+    height: 20px;
+    border-radius: 12px;
+    background: linear-gradient(90deg, #1d232c, #39465a);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.35);
+  }
+
+  &__watch-face {
+    position: absolute;
+    inset: 4px 18px;
+    border-radius: 12px;
+    background: linear-gradient(180deg, #f1f5f9, #d4dbe4);
+    box-shadow: inset 0 -4px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  &:not(.is-speaking) {
+    .prof-avatar__mouth-inner {
+      transform: scaleY(0.3);
+    }
+  }
+
+  &.is-speaking {
+    .prof-avatar__head {
+      animation: prof-avatar-head-bob 920ms ease-in-out infinite;
+    }
+
+    .prof-avatar__mouth-inner {
+      animation: prof-avatar-mouth-talk 180ms ease-in-out infinite;
+    }
+
+    .prof-avatar__arm--left {
+      animation: prof-avatar-arm-left 1140ms ease-in-out infinite;
+    }
+
+    .prof-avatar__arm--right {
+      animation: prof-avatar-arm-right 1260ms ease-in-out infinite;
+    }
+  }
+
+  @media (max-width: 900px) {
+    &__card {
+      width: min(420px, 92vw);
+      height: min(520px, 88vh);
+    }
+
+    &__stage {
+      transform: scale(var(--prof-avatar-scale, 1.4));
+    }
+  }
+
+  @media (max-width: 600px) {
+    &::before {
+      background: rgba(6, 8, 12, 0.84);
+    }
+
+    &__card {
+      width: 100%;
+      height: 100%;
+      border-radius: 0;
+      box-shadow: none;
+      padding: clamp(24px, 12vw, 32px);
+    }
+
+    &__stage {
+      transform: scale(var(--prof-avatar-scale, 1.1));
+    }
+  }
+}
+
+@keyframes prof-avatar-mouth-talk {
+  0%,
+  100% {
+    transform: scaleY(0.28);
+  }
+  35% {
+    transform: scaleY(1);
+  }
+  60% {
+    transform: scaleY(0.5);
+  }
+}
+
+@keyframes prof-avatar-head-bob {
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+  45% {
+    transform: rotate(-1.6deg) translateY(4px);
+  }
+}
+
+@keyframes prof-avatar-arm-left {
+  0%,
+  100% {
+    transform: rotate(-12deg);
+  }
+  50% {
+    transform: rotate(-26deg);
+  }
+}
+
+@keyframes prof-avatar-arm-right {
+  0%,
+  100% {
+    transform: rotate(14deg);
+  }
+  50% {
+    transform: rotate(28deg);
+  }
+}

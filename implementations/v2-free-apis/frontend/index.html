@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Avatar - Interactive Assistant</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!--
+    MAIN CONTAINER
+    This is the main wrapper for our app
+    -->
+    <div class="container">
+        
+        <!-- HEADER -->
+        <header class="header">
+            <h1>🧠 Jenniel - Prof. Neil Morgan's AI Surrogate</h1>
+            <p class="subtitle">Your personal marketing strategy consultant • Ask me anything and get expert video insights!</p>
+        </header>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="main-content">
+            
+            <!-- VIDEO PLAYER SECTION -->
+            <div class="video-section">
+                <div id="videoContainer" class="video-container">
+                    <!-- Initial state: Placeholder -->
+                    <div id="videoPlaceholder" class="video-placeholder">
+                        <div class="avatar-icon">🎭</div>
+                        <p>Ask me a question to see your AI avatar!</p>
+                    </div>
+                    
+                    <!-- Loading state: Shows while generating video -->
+                    <div id="loadingState" class="loading-state hidden">
+                        <div class="spinner"></div>
+                        <p class="loading-text">Creating your personalized response...</p>
+                        <p class="loading-subtext">This takes about 30-60 seconds</p>
+                    </div>
+                    
+                    <!-- Video player: Shows the generated avatar video -->
+                    <video 
+                        id="avatarVideo" 
+                        class="avatar-video hidden" 
+                        controls 
+                        autoplay
+                        playsinline>
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                
+                <!-- Display the AI's text response -->
+                <div id="responseText" class="response-text hidden">
+                    <strong>Response:</strong>
+                    <p id="responseContent"></p>
+                </div>
+            </div>
+
+            <!-- INPUT SECTION -->
+            <div class="input-section">
+                <!-- Voice Recording Indicator -->
+                <div id="recordingIndicator" class="recording-indicator hidden">
+                    <div class="recording-pulse"></div>
+                    <span class="recording-text">🎤 Listening... (Release to send)</span>
+                </div>
+                
+                <form id="chatForm" class="chat-form">
+                    <div class="input-group">
+                        <input 
+                            type="text" 
+                            id="userInput" 
+                            class="user-input" 
+                            placeholder="Type or hold mic button to speak..."
+                            autocomplete="off"
+                        >
+                        <button type="button" id="micBtn" class="mic-btn" title="Hold to speak">
+                            <span id="micIcon">🎤</span>
+                        </button>
+                        <button type="submit" id="submitBtn" class="submit-btn">
+                            <span id="submitText">Ask</span>
+                            <span id="submitIcon">→</span>
+                        </button>
+                    </div>
+                </form>
+                
+                <!-- Example questions for user guidance -->
+                <div class="example-questions">
+                    <p class="example-label">Try asking:</p>
+                    <div class="examples">
+                        <button class="example-btn" data-question="What is artificial intelligence?">
+                            What is AI?
+                        </button>
+                        <button class="example-btn" data-question="Explain quantum computing in simple terms">
+                            Quantum computing
+                        </button>
+                        <button class="example-btn" data-question="How do neural networks work?">
+                            Neural networks
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+            <p>Powered by Gemini AI + HeyGen Avatar Technology</p>
+        </footer>
+
+    </div>
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
+
+
+
