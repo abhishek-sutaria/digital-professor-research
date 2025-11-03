@@ -10,9 +10,12 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+# Python lib directories (but not our code lib folders)
+# lib/
 lib64/
 parts/
+# Allow intelligent-scraper lib folders
+!intelligent-scraper/*/lib/
 sdist/
 var/
 wheels/
