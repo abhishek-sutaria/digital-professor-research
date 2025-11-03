@@ -84,3 +84,14 @@ htmlcov/
 # Optional: Uncomment if research PDFs contain sensitive/unpublished work
 # research-notes/*.pdf
 
+# Cache and database files
+*.db
+scraping_cache.db
+
+# Test output directories
+*_test*/
+*_output/
+workflow3_test*/
+digital_twin_output/
+iu_output/
+output/

@@ -1,0 +1,56 @@
+# Core Dependencies
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+lxml>=4.9.0
+
+# Web Scraping
+selenium>=4.15.0
+webdriver-manager>=4.0.0
+
+# Google Scholar
+scholarly>=1.7.11
+
+# YouTube
+youtube-transcript-api>=0.6.1
+
+# Gemini API
+google-generativeai>=0.3.0
+
+# PDF Generation
+reportlab>=4.0.0
+Pillow>=10.0.0
+
+# Environment Variables
+python-dotenv>=1.0.0
+
+# Rate Limiting
+ratelimit>=2.2.1
+
+# Data Processing
+python-dateutil>=2.8.2
+
+# Progress Bars
+tqdm>=4.66.0
+
+# Text Processing
+nltk>=3.8.0
+
+# HTTP Client
+httpx>=0.25.0
+
+# Testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
+
+# PDF Processing
+PyMuPDF>=1.23.0
+
+# Academic Paper Sources
+arxiv>=2.1.0
+habanero>=1.2.0
+
+# PPTX Generation (optional)
+python-pptx>=0.6.23
+
+
+
