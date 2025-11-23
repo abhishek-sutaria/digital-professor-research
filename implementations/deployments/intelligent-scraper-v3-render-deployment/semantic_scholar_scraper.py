@@ -554,9 +554,10 @@ class SemanticScholarScraper:
 
     async def _extract_pdf_from_paper_page(self, paper_id: str, title: str = "") -> str:
         """Scrape Semantic Scholar paper page using Playwright to find alternate PDF sources."""
-        # TEMPORARILY DISABLED: Playwright may be causing hangs on Render
-        # TODO: Re-enable after fixing Playwright initialization issues
-        if False and PLAYWRIGHT_AVAILABLE:
+        paper_url = self._create_semantic_scholar_url(paper_id, title)
+        
+        # Try Playwright first if available
+        if PLAYWRIGHT_AVAILABLE:
             paper_url = self._create_semantic_scholar_url(paper_id, title)
             try:
                 # Use context manager approach (recommended by Playwright)
