@@ -105,6 +105,9 @@ async def run_scrape_job(job_id: str, author_id: str, profile_url: str, max_pape
     job["status"] = "running"
     job["message"] = "Fetching data…"
     job["percentage"] = 5
+    
+    # Log that scraping is starting
+    print(f"\n🚀 Starting scrape job {job_id} for author {author_id}, max_papers={max_papers}")
 
     timestamp = datetime.utcnow().strftime("%Y%m%d%H%M%S")
     html_path = HTML_DIR / f"semantic_scholar_{author_id}_{timestamp}.html"
@@ -113,13 +116,17 @@ async def run_scrape_job(job_id: str, author_id: str, profile_url: str, max_pape
     scraper = SemanticScholarScraper(
         api_key=os.getenv("SEMANTIC_SCHOLAR_API_KEY"),
         max_papers=max_papers,
-        verbose=False,
+        verbose=True,  # Enable verbose logging for debugging
         collect_debug=True,
         progress_handler=progress_handler,
     )
 
     try:
-        papers = await scraper.scrape_profile(author_id)
+        # Add timeout to prevent infinite hangs (5 minutes max)
+        papers = await asyncio.wait_for(
+            scraper.scrape_profile(author_id),
+            timeout=300.0  # 5 minutes timeout
+        )
         if not papers:
             job["status"] = "failed"
             job["message"] = "No papers found for this author."
@@ -144,10 +151,17 @@ async def run_scrape_job(job_id: str, author_id: str, profile_url: str, max_pape
             "html_url": f"/artifacts/html/{html_path.name}",
             "debug_url": f"/artifacts/debug/{debug_path.name}",
         }
+    except asyncio.TimeoutError:
+        print(f"\n❌ Scraping timed out after 5 minutes for job {job_id}")
+        job["status"] = "failed"
+        job["error"] = "Scraping timed out after 5 minutes. The operation took too long."
+        job["message"] = "Scrape timed out. Try with fewer papers or check server logs."
+        job["percentage"] = 100
     except Exception as exc:  # pylint: disable=broad-except
+        print(f"\n❌ Error in scrape job {job_id}: {exc}")
         traceback.print_exc()
         job["status"] = "failed"
         job["error"] = str(exc)
-        job["message"] = "Scrape failed. Check server logs for details."
+        job["message"] = f"Scrape failed: {str(exc)[:100]}"
         job["percentage"] = 100
 
