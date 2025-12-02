@@ -120,13 +120,18 @@ async def websocket_endpoint(websocket: WebSocket):
             'noplaylist': True,
             'quiet': True,
             'no_warnings': True,
-            'ignoreerrors': True, # We want to catch our cancellation exception though? 
-                                  # ignoreerrors=True might swallow it. 
-                                  # Let's keep it True for general errors but check state in loop.
-            'extractor_args': {'youtube': {'player_client': ['android']}},
-            # 'cookiesfrombrowser': ('chrome',), # Cookies caused 403, removing them
-            'progress_hooks': [progress_hook]
+            'ignoreerrors': True,
+            # 'extractor_args': {'youtube': {'player_client': ['android']}}, # Android client sometimes triggers bot detection on servers
+            'progress_hooks': [progress_hook],
+            'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         }
+
+        # Check for cookies.txt
+        if os.path.exists('cookies.txt'):
+            ydl_opts['cookiefile'] = 'cookies.txt'
+            print("DEBUG: Using cookies.txt")
+        else:
+            print("DEBUG: No cookies.txt found")
 
         # Task to listen for stop command
         async def listen_for_stop():
