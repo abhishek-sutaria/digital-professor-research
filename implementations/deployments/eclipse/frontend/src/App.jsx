@@ -13,6 +13,7 @@ function App() {
   const [previewVideo, setPreviewVideo] = useState(null)
   const [completedDownloads, setCompletedDownloads] = useState({}) // Map of video URL to download URL
   const [failedDownloads, setFailedDownloads] = useState(new Set()) // Set of failed video URLs
+  const [zipUrl, setZipUrl] = useState(null)
   const wsRef = useRef(null)
 
   // Environment variables for API URLs
@@ -80,6 +81,7 @@ function App() {
 
     setDownloading(true)
     setProgress({ current: 0, total: selectedVideos.size, status: 'Starting...' })
+    setZipUrl(null)
 
     wsRef.current = new WebSocket(WS_URL)
 
@@ -117,6 +119,11 @@ function App() {
       } else if (data.type === 'complete') {
         setDownloading(false)
         wsRef.current.close()
+
+        if (data.zip_url) {
+          setZipUrl(`${API_URL}${data.zip_url}`)
+        }
+
         alert('All downloads complete!')
       } else if (data.type === 'cancelled') {
         setDownloading(false)
@@ -200,6 +207,25 @@ function App() {
                 >
                   {downloading ? 'Downloading...' : `Download Selected (${selectedVideos.size})`}
                 </button>
+                {zipUrl && (
+                  <a
+                    href={zipUrl}
+                    download
+                    className="hero-btn"
+                    style={{
+                      background: '#46d369',
+                      color: 'white',
+                      textDecoration: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      border: 'none',
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    Save All (Zip)
+                  </a>
+                )}
                 {downloading && (
                   <button onClick={handleStop} className="hero-btn danger">Stop</button>
                 )}

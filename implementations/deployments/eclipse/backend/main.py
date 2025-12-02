@@ -6,6 +6,8 @@ import yt_dlp
 import os
 import asyncio
 import json
+import zipfile
+import shutil
 
 app = FastAPI()
 
@@ -147,6 +149,8 @@ async def websocket_endpoint(websocket: WebSocket):
         listener_task = asyncio.create_task(listen_for_stop())
 
         total_videos = len(urls)
+        downloaded_files = [] # Track successfully downloaded files
+
         for i, url in enumerate(urls):
             if state["stopped"]:
                 break
@@ -198,6 +202,9 @@ async def websocket_endpoint(websocket: WebSocket):
                 if requested_filename:
                      # Remove the 'downloads/' prefix if present
                     try:
+                        # Add to list of downloaded files
+                        downloaded_files.append(requested_filename)
+
                         rel_path = os.path.relpath(requested_filename, "downloads")
                         download_url = f"/downloads/{rel_path}"
                         print(f"DEBUG: Generated download_url: {download_url}")
@@ -217,7 +224,33 @@ async def websocket_endpoint(websocket: WebSocket):
         listener_task.cancel()
         
         if not state["stopped"]:
-            await websocket.send_json({"type": "complete"})
+            # Create ZIP file if we have downloaded files
+            zip_url = ""
+            if downloaded_files:
+                try:
+                    zip_filename = f"{author}_videos.zip"
+                    # Sanitize filename
+                    zip_filename = "".join([c for c in zip_filename if c.isalpha() or c.isdigit() or c in (' ', '.', '_')]).rstrip()
+                    zip_path = os.path.join(downloads_path, zip_filename)
+                    
+                    print(f"DEBUG: Creating zip file at {zip_path}")
+                    with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+                        for file_path in downloaded_files:
+                            if os.path.exists(file_path):
+                                # Add file to zip with just the filename (flat structure inside zip)
+                                arcname = os.path.basename(file_path)
+                                zipf.write(file_path, arcname)
+                                print(f"DEBUG: Added {file_path} to zip as {arcname}")
+                    
+                    zip_url = f"/downloads/{zip_filename}"
+                    print(f"DEBUG: Zip URL: {zip_url}")
+                except Exception as e:
+                    print(f"DEBUG: Error creating zip: {e}")
+
+            await websocket.send_json({
+                "type": "complete",
+                "zip_url": zip_url
+            })
         
     except Exception as e:
         print(f"WebSocket error: {e}")
