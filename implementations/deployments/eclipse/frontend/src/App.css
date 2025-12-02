@@ -1,0 +1,517 @@
+:root {
+    --bg-color: #000000;
+    --card-bg: #141414;
+    --text-primary: #ffffff;
+    --text-secondary: #b3b3b3;
+    --accent: #E50914;
+    --accent-hover: #f40612;
+    --input-bg: rgba(0, 0, 0, 0.75);
+    --input-border: rgba(255, 255, 255, 0.3);
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    margin: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+.app-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Landing Hero */
+.landing-hero {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-image: url('/cinematic-bg.png');
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.landing-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.8) 50%, #000000 100%);
+    z-index: 1;
+}
+
+.landing-content {
+    text-align: center;
+    max-width: 800px;
+    width: 100%;
+    padding: 2rem;
+    position: relative;
+    z-index: 2;
+}
+
+/* Red Glow Effect */
+.landing-content::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120%;
+    height: 120%;
+    background: radial-gradient(circle, rgba(229, 9, 20, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+    z-index: -1;
+    pointer-events: none;
+}
+
+.app-logo {
+    max-width: 700px;
+    /* Increased from 550px */
+    width: 100%;
+    margin-bottom: 2rem;
+    /* Fix for black background: Screen blend mode makes black transparent */
+    mix-blend-mode: screen;
+    /* CRITICAL: High contrast to crush dark greys to black so they disappear in screen mode */
+    filter: contrast(1.3) brightness(1.1) drop-shadow(0 0 20px rgba(229, 9, 20, 0.3));
+    /* Added red drop shadow for seamless integration */
+}
+
+.landing-content h1 {
+    font-size: 3.5rem;
+    font-weight: 900;
+    margin-bottom: 1rem;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.landing-content p {
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    font-weight: 400;
+    margin-bottom: 2.5rem;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.search-form {
+    display: flex;
+    max-width: 700px;
+    margin: 0 auto;
+    height: 60px;
+    /* Massive height */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.search-form input {
+    flex: 1;
+    padding: 0 1.5rem;
+    border-radius: 4px 0 0 4px;
+    /* Rounded left corners only */
+    border: none;
+    /* Removed border */
+    background: rgba(51, 51, 51, 0.5);
+    /* Deep Charcoal #333333 at 50% opacity */
+    color: white;
+    font-size: 1.2rem;
+    backdrop-filter: blur(10px);
+    transition: all 0.2s;
+}
+
+.search-form input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.search-form input:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.primary-btn {
+    background-color: var(--accent);
+    color: white;
+    border: none;
+    padding: 0 2.5rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    border-radius: 0 4px 4px 0;
+    /* Rounded right corners only */
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.primary-btn:hover {
+    background-color: var(--accent-hover);
+}
+
+.primary-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Hero Section */
+.hero-section {
+    height: 60vh;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to top, #141414 0%, rgba(20, 20, 20, 0.8) 20%, rgba(20, 20, 20, 0.4) 60%, rgba(20, 20, 20, 0.8) 100%);
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 0 4rem 4rem;
+    width: 100%;
+}
+
+.hero-content h1 {
+    font-size: 4rem;
+    font-weight: 900;
+    margin: 0 0 1rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.hero-stats {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 1.1rem;
+    color: #e5e5e5;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+}
+
+.dot {
+    color: var(--text-secondary);
+}
+
+.hero-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.hero-btn {
+    padding: 0.8rem 1.8rem;
+    border-radius: 4px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.2s, background 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.hero-btn:hover {
+    transform: scale(1.05);
+}
+
+.hero-btn.primary {
+    background: white;
+    color: black;
+}
+
+.hero-btn.primary:hover {
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.hero-btn.secondary {
+    background: rgba(109, 109, 110, 0.7);
+    color: white;
+}
+
+.hero-btn.secondary:hover {
+    background: rgba(109, 109, 110, 0.4);
+}
+
+.hero-btn.danger {
+    background: rgba(229, 9, 20, 0.8);
+    color: white;
+}
+
+.hero-btn.icon-only {
+    padding: 0.8rem;
+    background: rgba(109, 109, 110, 0.7);
+    color: white;
+}
+
+/* Content Section */
+.content-section {
+    padding: 2rem 4rem;
+    background: #141414;
+}
+
+/* Masonry Grid */
+.masonry-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.video-card {
+    background: var(--card-bg);
+    border-radius: 4px;
+    overflow: hidden;
+    transition: transform 0.3s, z-index 0.3s;
+    cursor: pointer;
+    position: relative;
+}
+
+.video-card:hover {
+    transform: scale(1.05);
+    /* Slight zoom on hover */
+    z-index: 10;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+}
+
+.video-card.selected {
+    outline: 2px solid white;
+}
+
+.thumbnail {
+    position: relative;
+    aspect-ratio: 16/9;
+}
+
+.thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.video-card:hover .overlay {
+    opacity: 1;
+}
+
+.play-btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: black;
+    transition: transform 0.2s;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.play-btn svg {
+    width: 65%;
+    height: 65%;
+    fill: black;
+    margin-left: 4px;
+    /* Optical centering */
+}
+
+.play-btn:hover {
+    transform: scale(1.1);
+    background: #ffffff;
+}
+
+.checkbox-ring {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.7);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.checkbox-fill {
+    width: 12px;
+    height: 12px;
+    background: white;
+    border-radius: 50%;
+}
+
+.duration-badge {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 2px 4px;
+    border-radius: 2px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.info {
+    padding: 1rem;
+}
+
+.info h3 {
+    margin: 0 0 0.5rem;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    color: #f5f5f5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.meta {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+/* Progress Bar */
+.progress-bar-container {
+    margin-bottom: 2rem;
+    background: #333;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+    height: 40px;
+}
+
+.progress-info {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.progress-track {
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--accent);
+    transition: width 0.3s ease;
+}
+
+/* Load More */
+.load-more-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 3rem;
+    padding-bottom: 4rem;
+}
+
+.load-more-btn {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: white;
+    padding: 0.8rem 2.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.load-more-btn:hover {
+    border-color: white;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: black;
+    width: 90%;
+    max-width: 1000px;
+    position: relative;
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+}
+
+.close-btn {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 2.5rem;
+    cursor: pointer;
+}
+
+.video-wrapper {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+}
+
+.video-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero-content h1 {
+        font-size: 2.5rem;
+    }
+
+    .hero-content {
+        padding: 0 2rem 2rem;
+    }
+
+    .content-section {
+        padding: 2rem;
+    }
+}
