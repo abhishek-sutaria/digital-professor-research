@@ -205,7 +205,7 @@ function App() {
                   disabled={selectedVideos.size === 0 || downloading}
                   className="hero-btn primary"
                 >
-                  {downloading ? 'Downloading...' : `Download Selected (${selectedVideos.size})`}
+                  {downloading ? 'Unlocking...' : `Unlock Selected (${selectedVideos.size})`}
                 </button>
                 {zipUrl && (
                   <a
@@ -213,7 +213,7 @@ function App() {
                     download
                     className="hero-btn"
                     style={{
-                      background: '#46d369',
+                      background: '#E50914',
                       color: 'white',
                       textDecoration: 'none',
                       display: 'inline-flex',
@@ -293,30 +293,6 @@ function App() {
                     <div className="meta">
                       <span>{video.view_count ? `${(video.view_count / 1000).toFixed(1)}K views` : 'N/A'}</span>
                     </div>
-                    {completedDownloads[video.url] && (
-                      <a
-                        href={completedDownloads[video.url]}
-                        download
-                        className="save-btn"
-                        onClick={(e) => e.stopPropagation()}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                          display: 'block',
-                          marginTop: '0.5rem',
-                          padding: '0.5rem',
-                          background: '#E50914',
-                          color: 'white',
-                          textAlign: 'center',
-                          borderRadius: '4px',
-                          textDecoration: 'none',
-                          fontWeight: 'bold',
-                          fontSize: '0.9rem'
-                        }}
-                      >
-                        Save to Device
-                      </a>
-                    )}
                     {failedDownloads.has(video.url) && (
                       <div style={{
                         marginTop: '0.5rem',
