@@ -12,6 +12,7 @@ function App() {
   const [limit, setLimit] = useState(20)
   const [previewVideo, setPreviewVideo] = useState(null)
   const [completedDownloads, setCompletedDownloads] = useState({}) // Map of video URL to download URL
+  const [failedDownloads, setFailedDownloads] = useState(new Set()) // Set of failed video URLs
   const wsRef = useRef(null)
 
   // Environment variables for API URLs
@@ -99,11 +100,19 @@ function App() {
           video: data.video_url
         })
 
-        if (data.status === 'finished' && data.download_url) {
-          setCompletedDownloads(prev => ({
-            ...prev,
-            [data.video_url]: `${API_URL}${data.download_url}`
-          }))
+        if (data.status === 'finished') {
+          if (data.download_url) {
+            setCompletedDownloads(prev => ({
+              ...prev,
+              [data.video_url]: `${API_URL}${data.download_url}`
+            }))
+          } else {
+            setFailedDownloads(prev => {
+              const newSet = new Set(prev)
+              newSet.add(data.video_url)
+              return newSet
+            })
+          }
         }
       } else if (data.type === 'complete') {
         setDownloading(false)
@@ -281,6 +290,20 @@ function App() {
                       >
                         Save to Device
                       </a>
+                    )}
+                    {failedDownloads.has(video.url) && (
+                      <div style={{
+                        marginTop: '0.5rem',
+                        padding: '0.5rem',
+                        background: 'rgba(229, 9, 20, 0.2)',
+                        border: '1px solid #E50914',
+                        color: '#ff6b6b',
+                        textAlign: 'center',
+                        borderRadius: '4px',
+                        fontSize: '0.9rem'
+                      }}>
+                        Download Failed
+                      </div>
                     )}
                   </div>
                 </div>
