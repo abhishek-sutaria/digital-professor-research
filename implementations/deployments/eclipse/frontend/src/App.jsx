@@ -13,10 +13,15 @@ function App() {
   const [previewVideo, setPreviewVideo] = useState(null)
   const wsRef = useRef(null)
 
+  // Environment variables for API URLs
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+  // Derive WebSocket URL from API URL (http -> ws, https -> wss)
+  const WS_URL = API_URL.replace(/^http/, 'ws').replace(/\/$/, '') + '/ws/download';
+
   const fetchVideos = async (searchLimit) => {
     setLoading(true)
     try {
-      const response = await fetch('http://localhost:8000/search', {
+      const response = await fetch(`${API_URL}/search`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ author, limit: searchLimit })
@@ -74,7 +79,7 @@ function App() {
     setDownloading(true)
     setProgress({ current: 0, total: selectedVideos.size, status: 'Starting...' })
 
-    wsRef.current = new WebSocket('ws://localhost:8000/ws/download')
+    wsRef.current = new WebSocket(WS_URL)
 
     wsRef.current.onopen = () => {
       wsRef.current.send(JSON.stringify({
@@ -113,7 +118,7 @@ function App() {
 
   const handleOpenFolder = async () => {
     try {
-      await fetch('http://localhost:8000/open-folder', {
+      await fetch(`${API_URL}/open-folder`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ author, limit: 20 })
