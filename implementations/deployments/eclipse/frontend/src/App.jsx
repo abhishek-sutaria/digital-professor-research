@@ -11,6 +11,7 @@ function App() {
   const [stats, setStats] = useState(null)
   const [limit, setLimit] = useState(20)
   const [previewVideo, setPreviewVideo] = useState(null)
+  const [completedDownloads, setCompletedDownloads] = useState({}) // Map of video URL to download URL
   const wsRef = useRef(null)
 
   // Environment variables for API URLs
@@ -97,6 +98,13 @@ function App() {
           status: data.status === 'downloading' ? 'Downloading...' : 'Finished',
           video: data.video_url
         })
+
+        if (data.status === 'finished' && data.download_url) {
+          setCompletedDownloads(prev => ({
+            ...prev,
+            [data.video_url]: `${API_URL}${data.download_url}`
+          }))
+        }
       } else if (data.type === 'complete') {
         setDownloading(false)
         wsRef.current.close()
@@ -116,17 +124,7 @@ function App() {
     }
   }
 
-  const handleOpenFolder = async () => {
-    try {
-      await fetch(`${API_URL}/open-folder`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ author, limit: 20 })
-      })
-    } catch (error) {
-      console.error("Failed to open folder", error)
-    }
-  }
+
 
   const openPreview = (e, url) => {
     e.stopPropagation()
@@ -196,9 +194,6 @@ function App() {
                 {downloading && (
                   <button onClick={handleStop} className="hero-btn danger">Stop</button>
                 )}
-                <button onClick={handleOpenFolder} className="hero-btn icon-only" title="Open Folder">
-                  📂
-                </button>
               </div>
             </div>
           </div>
@@ -263,6 +258,30 @@ function App() {
                     <div className="meta">
                       <span>{video.view_count ? `${(video.view_count / 1000).toFixed(1)}K views` : 'N/A'}</span>
                     </div>
+                    {completedDownloads[video.url] && (
+                      <a
+                        href={completedDownloads[video.url]}
+                        download
+                        className="save-btn"
+                        onClick={(e) => e.stopPropagation()}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: 'block',
+                          marginTop: '0.5rem',
+                          padding: '0.5rem',
+                          background: '#E50914',
+                          color: 'white',
+                          textAlign: 'center',
+                          borderRadius: '4px',
+                          textDecoration: 'none',
+                          fontWeight: 'bold',
+                          fontSize: '0.9rem'
+                        }}
+                      >
+                        Save to Device
+                      </a>
+                    )}
                   </div>
                 </div>
               ))}
