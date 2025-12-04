@@ -25,6 +25,13 @@ os.makedirs("downloads", exist_ok=True)
 # Mount downloads directory to serve static files
 app.mount("/downloads", StaticFiles(directory="downloads"), name="downloads")
 
+# Check for cookies in env var and write to file
+if os.environ.get("YOUTUBE_COOKIES_CONTENT"):
+    print("Writing cookies.txt from environment variable")
+    with open("cookies.txt", "w") as f:
+        f.write(os.environ["YOUTUBE_COOKIES_CONTENT"])
+
+
 class SearchRequest(BaseModel):
     author: str
     limit: int = 20

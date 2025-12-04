@@ -17,3 +17,5 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
+      - key: YOUTUBE_COOKIES_CONTENT
+        sync: false
