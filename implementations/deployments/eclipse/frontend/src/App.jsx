@@ -12,7 +12,7 @@ function App() {
   const [limit, setLimit] = useState(20)
   const [previewVideo, setPreviewVideo] = useState(null)
   const [completedDownloads, setCompletedDownloads] = useState({}) // Map of video URL to download URL
-  const [failedDownloads, setFailedDownloads] = useState(new Set()) // Set of failed video URLs
+  const [failedDownloads, setFailedDownloads] = useState(new Map()) // Map of video URL to error message
   const [zipUrl, setZipUrl] = useState(null)
   const wsRef = useRef(null)
 
@@ -110,9 +110,9 @@ function App() {
             }))
           } else {
             setFailedDownloads(prev => {
-              const newSet = new Set(prev)
-              newSet.add(data.video_url)
-              return newSet
+              const newMap = new Map(prev)
+              newMap.set(data.video_url, data.error || 'Download Failed')
+              return newMap
             })
           }
         }
@@ -304,7 +304,9 @@ function App() {
                         borderRadius: '4px',
                         fontSize: '0.9rem'
                       }}>
-                        Download Failed
+                        {typeof failedDownloads.get(video.url) === 'string'
+                          ? failedDownloads.get(video.url)
+                          : 'Download Failed'}
                       </div>
                     )}
                   </div>

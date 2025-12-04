@@ -83,7 +83,11 @@ async def search_videos(request: SearchRequest):
             }
         }
     except Exception as e:
-        return {"error": str(e)}
+        print(f"WebSocket error: {e}")
+
+# Add local bin to PATH for ffmpeg
+import os
+os.environ["PATH"] += os.pathsep + os.path.abspath("bin")
 
 @app.websocket("/ws/download")
 async def websocket_endpoint(websocket: WebSocket):
@@ -166,12 +170,14 @@ async def websocket_endpoint(websocket: WebSocket):
             # Run download in executor
             loop = asyncio.get_event_loop()
             info = None
+            error_msg = None
             try:
                 # Extract info first to get filename
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                     info = await loop.run_in_executor(None, lambda: ydl.extract_info(url, download=True))
             except Exception as e:
                 print(f"Download interrupted: {e}")
+                error_msg = str(e)
             
             if state["stopped"]:
                 await websocket.send_json({
@@ -210,6 +216,7 @@ async def websocket_endpoint(websocket: WebSocket):
                         print(f"DEBUG: Generated download_url: {download_url}")
                     except Exception as e:
                         print(f"DEBUG: Error generating relpath: {e}")
+                        error_msg = str(e)
 
             await websocket.send_json({
                 "type": "progress",
@@ -217,7 +224,8 @@ async def websocket_endpoint(websocket: WebSocket):
                 "total": total_videos,
                 "status": "finished",
                 "video_url": url,
-                "download_url": download_url
+                "download_url": download_url,
+                "error": error_msg
             })
 
         # Cleanup listener
