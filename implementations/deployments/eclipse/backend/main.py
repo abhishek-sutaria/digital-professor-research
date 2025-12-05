@@ -239,48 +239,26 @@ async def websocket_endpoint(websocket: WebSocket):
             info = None
             error_msg = None
             
-            # Prepare retry options
-            download_attempts = [{'opts': ydl_opts, 'desc': 'default'}]
+            # Run download in executor
+            loop = asyncio.get_event_loop()
+            info = None
+            error_msg = None
             
-            # Add fallback with browser cookies
-            fallback_opts = ydl_opts.copy()
-            fallback_opts['cookiesfrombrowser'] = ('chrome',)
-            if 'cookiefile' in fallback_opts:
-                del fallback_opts['cookiefile']
-            download_attempts.append({'opts': fallback_opts, 'desc': 'browser_cookies'})
-
-            for attempt_idx, attempt in enumerate(download_attempts):
-                current_opts = attempt['opts']
-                try:
-                    # Extract info first to get filename
-                    print(f"DEBUG: Calling yt-dlp extract_info for {url} (attempt: {attempt['desc']})")
-                    with yt_dlp.YoutubeDL(current_opts) as ydl:
-                        info = await loop.run_in_executor(None, lambda: ydl.extract_info(url, download=True))
-                    print(f"DEBUG: yt-dlp finished for {url}")
-                    break # Success, exit retry loop
-                except Exception as e:
-                    is_bot_error = "Sign in to confirm you’re not a bot" in str(e)
-                    is_last_attempt = attempt_idx == len(download_attempts) - 1
-                    
-                    if is_bot_error and not is_last_attempt:
-                        print(f"WARNING: Bot detection triggered. Retrying with browser cookies...")
-                        await safe_send_json({
-                            "type": "progress",
-                            "current_index": i,
-                            "total": total_videos,
-                            "status": "Bot check detected, retrying with browser cookies...",
-                            "video_url": url
-                        })
-                        continue
-                    
-                    print(f"Download interrupted for {url}: {e}")
-                    traceback.print_exc()
-                    error_msg = str(e)
-                    # Handle specific I/O error caused by HTTP 400
-                    if "I/O operation on closed file" in str(e):
-                        error_msg = "YouTube blocked the request (HTTP 400). Try again later."
-                    elif is_bot_error:
-                         error_msg = "YouTube Bot Detection: Please export cookies.txt or sign in to Chrome."
+            try:
+                # Extract info first to get filename
+                print(f"DEBUG: Calling yt-dlp extract_info for {url}")
+                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                    info = await loop.run_in_executor(None, lambda: ydl.extract_info(url, download=True))
+                print(f"DEBUG: yt-dlp finished for {url}")
+            except Exception as e:
+                print(f"Download interrupted for {url}: {e}")
+                traceback.print_exc()
+                error_msg = str(e)
+                # Handle specific I/O error caused by HTTP 400
+                if "I/O operation on closed file" in str(e):
+                    error_msg = "YouTube blocked the request (HTTP 400). Try again later."
+                elif "Sign in to confirm you’re not a bot" in str(e):
+                    error_msg = "YouTube Bot Detection: Please update cookies and/or PO Token."
             
             if state["stopped"]:
                 await safe_send_json({
