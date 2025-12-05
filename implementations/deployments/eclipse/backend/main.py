@@ -139,6 +139,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
         # Shared state for cancellation
         state = {"stopped": False}
+        listener_task = None # Initialize to avoid NameError
 
         # Progress hook to check for cancellation
         def progress_hook(d):
@@ -166,11 +167,30 @@ async def websocket_endpoint(websocket: WebSocket):
             'progress_hooks': [progress_hook],
             'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
             'source_address': '0.0.0.0', # Force IPv4 to avoid IPv6 blocks
-            'username': 'oauth2', # Enable OAuth2 authentication
-            'password': '',
+            # 'username': 'oauth2', # Removed: OAuth2 is no longer supported
+            # 'password': '',
         }
 
-        # ... (cookies check and listener task remain same)
+        # Check for cookies.txt
+        if os.path.exists('cookies.txt'):
+            size = os.path.getsize('cookies.txt')
+            print(f"DEBUG: Using cookies.txt (size: {size} bytes)")
+            ydl_opts['cookiefile'] = 'cookies.txt'
+        else:
+            print("DEBUG: No cookies.txt found")
+
+        # Task to listen for stop command
+        async def listen_for_stop():
+            try:
+                while not state["stopped"]:
+                    msg = await websocket.receive_text()
+                    if msg == "stop":
+                        state["stopped"] = True
+                        print("Stop command received")
+            except Exception:
+                pass
+
+        listener_task = asyncio.create_task(listen_for_stop())
 
         total_videos = len(urls)
         downloaded_files = [] # Track successfully downloaded files
@@ -272,7 +292,8 @@ async def websocket_endpoint(websocket: WebSocket):
             })
 
         # Cleanup listener
-        listener_task.cancel()
+        if listener_task:
+            listener_task.cancel()
         
         if not state["stopped"]:
             # Create ZIP file if we have downloaded files
