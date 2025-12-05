@@ -166,6 +166,8 @@ async def websocket_endpoint(websocket: WebSocket):
             'progress_hooks': [progress_hook],
             'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
             'source_address': '0.0.0.0', # Force IPv4 to avoid IPv6 blocks
+            'username': 'oauth2', # Enable OAuth2 authentication
+            'password': '',
         }
 
         # ... (cookies check and listener task remain same)
