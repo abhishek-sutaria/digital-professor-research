@@ -171,11 +171,6 @@ async def websocket_endpoint(websocket: WebSocket):
                     error_msg = "YouTube blocked the request (HTTP 400). Try again later."
             
             if state["stopped"]:
-                # ... (break logic)
-
-            # ... (rest of the loop)
-            
-            if state["stopped"]:
                 await safe_send_json({
                     "type": "cancelled",
                     "current_index": i,
