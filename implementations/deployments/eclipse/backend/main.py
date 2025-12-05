@@ -99,9 +99,31 @@ import os
 import traceback
 os.environ["PATH"] += os.pathsep + os.path.abspath("bin")
 
+# Custom logger to prevent yt-dlp from writing to closed stdout/stderr
+class MyLogger:
+    def debug(self, msg):
+        # Only print if it's not a progress line to reduce noise
+        if not msg.startswith('[download]'):
+            print(f"YTDLP: {msg}")
+
+    def warning(self, msg):
+        print(f"YTDLP WARNING: {msg}")
+
+    def error(self, msg):
+        print(f"YTDLP ERROR: {msg}")
+
 @app.websocket("/ws/download")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
+    
+    # Helper for safe sending
+    async def safe_send_json(data):
+        try:
+            await websocket.send_json(data)
+        except Exception as e:
+            print(f"WebSocket send failed: {e}")
+            # Don't raise, just log. This prevents the loop from crashing if user disconnects.
+
     try:
         data = await websocket.receive_text()
         request_data = json.loads(data)
@@ -137,6 +159,7 @@ async def websocket_endpoint(websocket: WebSocket):
             'quiet': True,
             'no_warnings': True,
             'ignoreerrors': True,
+            'logger': MyLogger(), # Use custom logger
             # 'extractor_args': {'youtube': {'player_client': ['android']}}, # Android client sometimes triggers bot detection on servers
             'progress_hooks': [progress_hook],
             'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -171,7 +194,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 break
 
             print(f"DEBUG: Starting download for {url}")
-            await websocket.send_json({
+            await safe_send_json({
                 "type": "progress",
                 "current_index": i,
                 "total": total_videos,
@@ -195,7 +218,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 error_msg = str(e)
             
             if state["stopped"]:
-                await websocket.send_json({
+                await safe_send_json({
                     "type": "cancelled",
                     "current_index": i,
                     "total": total_videos
@@ -234,7 +257,7 @@ async def websocket_endpoint(websocket: WebSocket):
                         traceback.print_exc()
                         error_msg = str(e)
 
-            await websocket.send_json({
+            await safe_send_json({
                 "type": "progress",
                 "current_index": i + 1,
                 "total": total_videos,
@@ -272,7 +295,7 @@ async def websocket_endpoint(websocket: WebSocket):
                     print(f"DEBUG: Error creating zip: {e}")
                     traceback.print_exc()
 
-            await websocket.send_json({
+            await safe_send_json({
                 "type": "complete",
                 "zip_url": zip_url
             })
