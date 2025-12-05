@@ -90,10 +90,13 @@ async def search_videos(request: SearchRequest):
             }
         }
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         print(f"WebSocket error: {e}")
 
 # Add local bin to PATH for ffmpeg
 import os
+import traceback
 os.environ["PATH"] += os.pathsep + os.path.abspath("bin")
 
 @app.websocket("/ws/download")
@@ -141,8 +144,9 @@ async def websocket_endpoint(websocket: WebSocket):
 
         # Check for cookies.txt
         if os.path.exists('cookies.txt'):
+            size = os.path.getsize('cookies.txt')
+            print(f"DEBUG: Using cookies.txt (size: {size} bytes)")
             ydl_opts['cookiefile'] = 'cookies.txt'
-            print("DEBUG: Using cookies.txt")
         else:
             print("DEBUG: No cookies.txt found")
 
@@ -166,6 +170,7 @@ async def websocket_endpoint(websocket: WebSocket):
             if state["stopped"]:
                 break
 
+            print(f"DEBUG: Starting download for {url}")
             await websocket.send_json({
                 "type": "progress",
                 "current_index": i,
@@ -180,10 +185,13 @@ async def websocket_endpoint(websocket: WebSocket):
             error_msg = None
             try:
                 # Extract info first to get filename
+                print(f"DEBUG: Calling yt-dlp extract_info for {url}")
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                     info = await loop.run_in_executor(None, lambda: ydl.extract_info(url, download=True))
+                print(f"DEBUG: yt-dlp finished for {url}")
             except Exception as e:
-                print(f"Download interrupted: {e}")
+                print(f"Download interrupted for {url}: {e}")
+                traceback.print_exc()
                 error_msg = str(e)
             
             if state["stopped"]:
@@ -202,9 +210,9 @@ async def websocket_endpoint(websocket: WebSocket):
                     info = info['entries'][0]
                 
                 # Debug logging
-                print(f"DEBUG: Info keys: {info.keys()}")
+                # print(f"DEBUG: Info keys: {info.keys()}") # Reduced noise
                 print(f"DEBUG: Filename from info: {info.get('filename')}")
-                print(f"DEBUG: Requested outtmpl: {ydl_opts['outtmpl']}")
+                # print(f"DEBUG: Requested outtmpl: {ydl_opts['outtmpl']}")
 
                 requested_filename = info.get('filename')
                 if not requested_filename:
@@ -223,6 +231,7 @@ async def websocket_endpoint(websocket: WebSocket):
                         print(f"DEBUG: Generated download_url: {download_url}")
                     except Exception as e:
                         print(f"DEBUG: Error generating relpath: {e}")
+                        traceback.print_exc()
                         error_msg = str(e)
 
             await websocket.send_json({
@@ -261,6 +270,7 @@ async def websocket_endpoint(websocket: WebSocket):
                     print(f"DEBUG: Zip URL: {zip_url}")
                 except Exception as e:
                     print(f"DEBUG: Error creating zip: {e}")
+                    traceback.print_exc()
 
             await websocket.send_json({
                 "type": "complete",
@@ -269,6 +279,7 @@ async def websocket_endpoint(websocket: WebSocket):
         
     except Exception as e:
         print(f"WebSocket error: {e}")
+        traceback.print_exc()
 
 @app.post("/open-folder")
 async def open_folder(request: SearchRequest):
