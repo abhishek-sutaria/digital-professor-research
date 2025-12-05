@@ -158,7 +158,7 @@ async def websocket_endpoint(websocket: WebSocket):
             'noplaylist': True,
             'quiet': True,
             'no_warnings': True,
-            'ignoreerrors': True,
+            # 'ignoreerrors': True, # Commented out to expose errors
             'logger': MyLogger(), # Use custom logger
             # 'extractor_args': {'youtube': {'player_client': ['android']}}, # Android client sometimes triggers bot detection on servers
             'progress_hooks': [progress_hook],
@@ -256,6 +256,8 @@ async def websocket_endpoint(websocket: WebSocket):
                         print(f"DEBUG: Error generating relpath: {e}")
                         traceback.print_exc()
                         error_msg = str(e)
+            elif not error_msg:
+                error_msg = "Download failed (unknown error)"
 
             await safe_send_json({
                 "type": "progress",
