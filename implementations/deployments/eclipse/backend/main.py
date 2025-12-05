@@ -165,14 +165,19 @@ async def websocket_endpoint(websocket: WebSocket):
             'logger': MyLogger(), # Use custom logger
             # 'extractor_args': {'youtube': {'player_client': ['android']}}, # Removed: Android client + desktop cookies can trigger bot detection
             'progress_hooks': [progress_hook],
-            # 'user_agent': 'Mozilla/5.0 ...', # Removed: Let yt-dlp choose to avoid fingerprint mismatch
             'source_address': '0.0.0.0', # Force IPv4 to avoid IPv6 blocks
         }
 
         # Add PO Token and Visitor Data if available (Critical for bot bypass)
         po_token = os.environ.get("YOUTUBE_PO_TOKEN")
         visitor_data = os.environ.get("YOUTUBE_VISITOR_DATA")
+        user_agent_env = os.environ.get("YOUTUBE_USER_AGENT")
         
+        # Set User Agent if provided (Must match the browser describing cookies/tokens)
+        if user_agent_env:
+            print(f"DEBUG: Using custom User Agent from env")
+            ydl_opts['user_agent'] = user_agent_env
+
         if po_token and visitor_data:
             print(f"DEBUG: Using PO Token and Visitor Data")
             ydl_opts['extractor_args'] = {
