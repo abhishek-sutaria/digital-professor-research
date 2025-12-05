@@ -101,11 +101,57 @@ import random
 import asyncio
 os.environ["PATH"] += os.pathsep + os.path.abspath("bin")
 
-# ... (MyLogger class remains same)
+# Custom logger to prevent yt-dlp from writing to closed stdout/stderr
+class MyLogger:
+    def debug(self, msg):
+        # Only print if it's not a progress line to reduce noise
+        if not msg.startswith('[download]'):
+            print(f"YTDLP: {msg}")
+
+    def warning(self, msg):
+        print(f"YTDLP WARNING: {msg}")
+
+    def error(self, msg):
+        print(f"YTDLP ERROR: {msg}")
 
 @app.websocket("/ws/download")
 async def websocket_endpoint(websocket: WebSocket):
-    # ... (setup code remains same)
+    await websocket.accept()
+    
+    # Helper for safe sending
+    async def safe_send_json(data):
+        try:
+            await websocket.send_json(data)
+        except Exception as e:
+            print(f"WebSocket send failed: {e}")
+            # Don't raise, just log. This prevents the loop from crashing if user disconnects.
+
+    try:
+        data = await websocket.receive_text()
+        request_data = json.loads(data)
+        urls = request_data.get("urls", [])
+        author = request_data.get("author", "Unknown")
+        
+        # Use local downloads folder for static serving
+        downloads_path = "downloads"
+        output_dir = os.path.join(downloads_path, author)
+        os.makedirs(output_dir, exist_ok=True)
+
+        # Shared state for cancellation
+        state = {"stopped": False}
+
+        # Progress hook to check for cancellation
+        def progress_hook(d):
+            if state["stopped"]:
+                raise Exception("Download cancelled by user")
+            
+            if d['status'] == 'downloading':
+                try:
+                    # We can't easily send async messages from here without a loop reference
+                    # But we can rely on the loop below to send start/finish events
+                    pass 
+                except Exception:
+                    pass
 
         ydl_opts = {
             'format': 'bestvideo[ext=mp4][vcodec^=avc]+bestaudio[ext=m4a]/best[ext=mp4]/best',
