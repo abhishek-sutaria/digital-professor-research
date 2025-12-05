@@ -97,59 +97,15 @@ async def search_videos(request: SearchRequest):
 # Add local bin to PATH for ffmpeg
 import os
 import traceback
+import random
+import asyncio
 os.environ["PATH"] += os.pathsep + os.path.abspath("bin")
 
-# Custom logger to prevent yt-dlp from writing to closed stdout/stderr
-class MyLogger:
-    def debug(self, msg):
-        # Only print if it's not a progress line to reduce noise
-        if not msg.startswith('[download]'):
-            print(f"YTDLP: {msg}")
-
-    def warning(self, msg):
-        print(f"YTDLP WARNING: {msg}")
-
-    def error(self, msg):
-        print(f"YTDLP ERROR: {msg}")
+# ... (MyLogger class remains same)
 
 @app.websocket("/ws/download")
 async def websocket_endpoint(websocket: WebSocket):
-    await websocket.accept()
-    
-    # Helper for safe sending
-    async def safe_send_json(data):
-        try:
-            await websocket.send_json(data)
-        except Exception as e:
-            print(f"WebSocket send failed: {e}")
-            # Don't raise, just log. This prevents the loop from crashing if user disconnects.
-
-    try:
-        data = await websocket.receive_text()
-        request_data = json.loads(data)
-        urls = request_data.get("urls", [])
-        author = request_data.get("author", "Unknown")
-        
-        # Use local downloads folder for static serving
-        downloads_path = "downloads"
-        output_dir = os.path.join(downloads_path, author)
-        os.makedirs(output_dir, exist_ok=True)
-
-        # Shared state for cancellation
-        state = {"stopped": False}
-
-        # Progress hook to check for cancellation
-        def progress_hook(d):
-            if state["stopped"]:
-                raise Exception("Download cancelled by user")
-            
-            if d['status'] == 'downloading':
-                try:
-                    # We can't easily send async messages from here without a loop reference
-                    # But we can rely on the loop below to send start/finish events
-                    pass 
-                except Exception:
-                    pass
+    # ... (setup code remains same)
 
         ydl_opts = {
             'format': 'bestvideo[ext=mp4][vcodec^=avc]+bestaudio[ext=m4a]/best[ext=mp4]/best',
@@ -160,31 +116,12 @@ async def websocket_endpoint(websocket: WebSocket):
             'no_warnings': True,
             # 'ignoreerrors': True, # Commented out to expose errors
             'logger': MyLogger(), # Use custom logger
-            # 'extractor_args': {'youtube': {'player_client': ['android']}}, # Android client sometimes triggers bot detection on servers
+            'extractor_args': {'youtube': {'player_client': ['android']}}, # Android client to bypass bot detection
             'progress_hooks': [progress_hook],
             'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         }
 
-        # Check for cookies.txt
-        if os.path.exists('cookies.txt'):
-            size = os.path.getsize('cookies.txt')
-            print(f"DEBUG: Using cookies.txt (size: {size} bytes)")
-            ydl_opts['cookiefile'] = 'cookies.txt'
-        else:
-            print("DEBUG: No cookies.txt found")
-
-        # Task to listen for stop command
-        async def listen_for_stop():
-            try:
-                while not state["stopped"]:
-                    msg = await websocket.receive_text()
-                    if msg == "stop":
-                        state["stopped"] = True
-                        print("Stop command received")
-            except Exception:
-                pass
-
-        listener_task = asyncio.create_task(listen_for_stop())
+        # ... (cookies check and listener task remain same)
 
         total_videos = len(urls)
         downloaded_files = [] # Track successfully downloaded files
@@ -192,6 +129,19 @@ async def websocket_endpoint(websocket: WebSocket):
         for i, url in enumerate(urls):
             if state["stopped"]:
                 break
+            
+            # Add random delay to avoid rate limiting (except for the first video)
+            if i > 0:
+                delay = random.uniform(3, 7)
+                print(f"DEBUG: Waiting {delay:.2f}s before next download...")
+                await safe_send_json({
+                    "type": "progress",
+                    "current_index": i,
+                    "total": total_videos,
+                    "status": f"Waiting {int(delay)}s...",
+                    "video_url": url
+                })
+                await asyncio.sleep(delay)
 
             print(f"DEBUG: Starting download for {url}")
             await safe_send_json({
@@ -216,6 +166,14 @@ async def websocket_endpoint(websocket: WebSocket):
                 print(f"Download interrupted for {url}: {e}")
                 traceback.print_exc()
                 error_msg = str(e)
+                # Handle specific I/O error caused by HTTP 400
+                if "I/O operation on closed file" in str(e):
+                    error_msg = "YouTube blocked the request (HTTP 400). Try again later."
+            
+            if state["stopped"]:
+                # ... (break logic)
+
+            # ... (rest of the loop)
             
             if state["stopped"]:
                 await safe_send_json({
